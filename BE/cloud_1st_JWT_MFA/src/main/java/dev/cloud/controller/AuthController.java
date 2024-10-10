@@ -3,13 +3,11 @@ package dev.cloud.controller;
 import dev.cloud.dto.TokenDto;
 import dev.cloud.dto.MemberRequestDto;
 import dev.cloud.dto.MemberResponseDto;
+import dev.cloud.dto.TokenRequestDto;
 import dev.cloud.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -27,4 +25,13 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(memberRequestDto));
     }
 
+    @PostMapping("/reissue")
+    public ResponseEntity<?> reissue(@RequestBody TokenRequestDto tokenRequestDto) {
+        return ResponseEntity.ok(authService.reissue(tokenRequestDto));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody TokenRequestDto tokenRequestDto) {
+        return authService.logout(tokenRequestDto);
+    }
 }

@@ -28,7 +28,7 @@ public class TokenProvider {
     private static final String BEARER_TYPE = "Bearer";
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30;
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;
-    
+
     private final Key key;
     
     public TokenProvider(@Value("${jwt.secret}") String secretKey) {
@@ -110,5 +110,13 @@ public class TokenProvider {
         } catch (ExpiredJwtException e) {
             return e.getClaims();
         }
+    }
+
+    public long getRefreshTokenExpireTime() {
+        return REFRESH_TOKEN_EXPIRE_TIME;
+    }
+
+    public long getAccessTokenExpireTime() {
+        return ACCESS_TOKEN_EXPIRE_TIME;
     }
 }
