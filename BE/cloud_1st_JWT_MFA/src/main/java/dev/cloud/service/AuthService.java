@@ -1,11 +1,11 @@
 package dev.cloud.service;
 
 import dev.cloud.dto.TokenDto;
-import dev.cloud.dto.UserRequestDto;
-import dev.cloud.dto.UserResponseDto;
+import dev.cloud.dto.MemberRequestDto;
+import dev.cloud.dto.MemberResponseDto;
 import dev.cloud.jwt.TokenProvider;
 import dev.cloud.model.Member;
-import dev.cloud.repository.UserRepository;
+import dev.cloud.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,42 +18,28 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
 
     @Transactional
-    public UserResponseDto signup(UserRequestDto userRequestDto) {
-        if (userRepository.existsByEmail(userRequestDto.getEmail())) {
+    public MemberResponseDto signup(MemberRequestDto memberRequestDto) {
+        if (memberRepository.existsByEmail(memberRequestDto.getEmail())) {
             throw new RuntimeException("이미 가입되어 있는 유저입니다.");
         }
 
-        Member user = userRequestDto.toUser(passwordEncoder);
-        return UserResponseDto.of(userRepository.save(user));
+        Member user = memberRequestDto.toUser(passwordEncoder);
+        return MemberResponseDto.of(memberRepository.save(user));
     }
 
     @Transactional
-    public TokenDto login(UserRequestDto userRequestDto) {
-        UsernamePasswordAuthenticationToken authenticationToken = userRequestDto.toAuthentication();
+    public TokenDto login(MemberRequestDto memberRequestDto) {
+        UsernamePasswordAuthenticationToken authenticationToken = memberRequestDto.toAuthentication();
 
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
         TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
 
-//        RefreshToken refreshToken = RefreshToken.builder()
-//                .key(authentication.getName())
-//                .value(tokenDto.getRefreshToken())
-//                .build();
-//
-//        refreshTokenRepository.save(refreshToken);
-
-        // 5. 토큰 발급
         return tokenDto;
     }
-
-
-//    public UserResponseDto reissue(TokenRequestDto tokenRequestDto) {
-//
-//
-//    }
 }
