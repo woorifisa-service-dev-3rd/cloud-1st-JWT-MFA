@@ -36,5 +36,5 @@ out/
 ### VS Code ###
 .vscode/
 /src/main/resources/application-db.properties
-/src/main/resources/application-smtp.properties
+/src/main/resources/application-smtp.yml
 
