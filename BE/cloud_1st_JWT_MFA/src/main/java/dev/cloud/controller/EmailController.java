@@ -13,13 +13,13 @@ public class EmailController {
     private final EmailService emailService;
 
     // 인증번호 전송
-    @GetMapping("/auth")
+    @GetMapping(value = "/auth", produces = "application/json")
     public EmailAuthResponseDto sendAuthCode(@RequestParam String address) {
         return emailService.sendEmail(address);
     }
 
     // 인증번호 검증
-    @PostMapping("/auth")
+    @PostMapping(value = "/auth", produces = "application/json")
     public EmailAuthResponseDto checkAuthCode(@RequestParam String address, @RequestParam String authCode) {
         return emailService.validateAuthCode(address, authCode);
     }

@@ -1,5 +1,8 @@
 package dev.cloud.dto;
 
+import lombok.Data;
+
+@Data
 public class EmailAuthResponseDto {
     private boolean success;
     private String responseMessage;
