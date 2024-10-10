@@ -8,7 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class SecurityUtil {
     private SecurityUtil() {}
 
-    // JwtFilter에서 SecurityContext에 세팅한 User 정보를 꺼낸다.
+    // JwtFilter에서 SecurityContext에 세팅한 Member 정보를 꺼낸다.
     public static Long getCurrentUserId() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

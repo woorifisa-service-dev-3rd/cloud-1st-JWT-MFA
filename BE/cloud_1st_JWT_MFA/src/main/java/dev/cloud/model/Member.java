@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Table(name = "user")
-public class User {
+public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,7 +29,7 @@ public class User {
     private Authority authority;
 
     @Builder
-    public User(String email, String pw, String name, Authority authority) {
+    public Member(String email, String pw, String name, Authority authority) {
         this.email =email;
         this.pw = pw;
         this.name = name;

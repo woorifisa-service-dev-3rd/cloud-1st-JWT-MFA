@@ -1,6 +1,6 @@
 package dev.cloud.dto;
 
-import dev.cloud.model.User;
+import dev.cloud.model.Member;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -19,12 +19,12 @@ public class UserResponseDto {
         this.name = name;
     }
 
-    public static UserResponseDto of(User user) {
+    public static UserResponseDto of(Member member) {
         return UserResponseDto.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .name(user.getName())
-                .authority(user.getAuthority().name())
+                .id(member.getId())
+                .email(member.getEmail())
+                .name(member.getName())
+                .authority(member.getAuthority().name())
                 .build();
     }
 }

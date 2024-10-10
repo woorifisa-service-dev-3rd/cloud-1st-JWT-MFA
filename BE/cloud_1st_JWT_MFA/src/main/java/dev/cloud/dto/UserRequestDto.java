@@ -1,7 +1,7 @@
 package dev.cloud.dto;
 
 import dev.cloud.model.Authority;
-import dev.cloud.model.User;
+import dev.cloud.model.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,8 +17,8 @@ public class UserRequestDto {
     private String pw;
     private String name;
 
-    public User toUser(PasswordEncoder passwordEncoder) {
-        return User.builder()
+    public Member toUser(PasswordEncoder passwordEncoder) {
+        return Member.builder()
                 .email(email)
                 .pw(passwordEncoder.encode(pw))
                 .name(name)
