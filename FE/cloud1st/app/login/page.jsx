@@ -1,39 +1,52 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Modal from "../../components/Modal"; // 모달 컴포넌트 임포트
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const router = useRouter();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    // TODO: API를 호출해 로그인 처리
-    e.preventDefault(); // 폼의 기본 제출 동작 방지
-
     const userData = { email, pw };
 
     try {
-      const response = await fetch('http://localhost:8080/api/users/signin', {
-        method: 'post',
+      const response = await fetch("http://localhost:8080/api/auth/signin", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(userData),
       });
 
       if (response.ok) {
         const data = await response.json();
-        // 성공 처리 (예: 사용자 리다이렉션)
-        console.log('로긴 성공:', data);
+        if (data.emailSent) {
+          setModalMessage("로그인 성공! 이메일 인증 페이지로 이동합니다.");
+          setShowModal(true);
+
+          // 모달이 닫힌 후 이메일 인증 페이지로 이동
+          setTimeout(() => {
+            setShowModal(false);
+            router.push(`/verify-email?email=${email}`);
+          }, 2000);
+        }
       } else {
-        // 에러 처리
-        console.error('로긴 실패');
+        setModalMessage("로그인 실패. 다시 시도해주세요.");
+        setShowModal(true);
       }
     } catch (error) {
-      console.error('에러 발생:', error);
+      setModalMessage("에러 발생: 서버와 통신할 수 없습니다.");
+      setShowModal(true);
     }
+  };
 
-    console.log("Login:", email, pw);
+  const closeModal = () => {
+    setShowModal(false);
   };
 
   return (
@@ -56,8 +69,13 @@ export default function Login() {
           required
           className="mb-4"
         />
-        <button type="submit" className="bg-green-500 text-white py-2">로그인</button>
+        <button type="submit" className="bg-green-500 text-white py-2">
+          로그인
+        </button>
       </form>
+      {showModal && (
+        <Modal message={modalMessage} onClose={closeModal} />
+      )}
     </div>
   );
 }
