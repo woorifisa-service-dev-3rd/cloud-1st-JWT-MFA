@@ -2,6 +2,7 @@ package dev.cloud.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -23,4 +24,15 @@ public class User {
 
     @Column(nullable = false)
     private String name;
+
+    @Enumerated(EnumType.STRING)
+    private Authority authority;
+
+    @Builder
+    public User(String email, String pw, String name, Authority authority) {
+        this.email =email;
+        this.pw = pw;
+        this.name = name;
+        this.authority = authority;
+    }
 }
