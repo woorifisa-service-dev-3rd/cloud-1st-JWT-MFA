@@ -26,7 +26,7 @@ public class SecurityConfig  {
                // 요청에 대한 권한 부여 설정
                .authorizeHttpRequests(auth -> auth
                        .requestMatchers("/api/users/**").permitAll() // 인증 관련 API는 모두 허용
-                       .anyRequest().authenticated() // 그 외의 모든 요청은 인증 필요
+                       .anyRequest().permitAll() // 일단 허용
                )
 
                // 폼 로그인 비활성화

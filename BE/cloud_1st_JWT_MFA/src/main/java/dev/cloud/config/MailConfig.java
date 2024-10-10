@@ -1,5 +1,6 @@
 package dev.cloud.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -9,13 +10,25 @@ import java.util.Properties;
 
 @Configuration
 public class MailConfig {
+    @Value("${spring.mail.username}")
+    String username;
+
+    @Value("${spring.mail.password}")
+    String password;
+
+    @Value("${spring.mail.host}")
+    String host;
+
+    @Value("${spring.mail.port}")
+    int port;
+
     @Bean
     public JavaMailSender javaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost("smtp.gmail.com");
-        mailSender.setPort(587);
-        mailSender.setUsername("설정 한 이메일 주소");
-        mailSender.setPassword("발급 받은 비밀번호");
+        mailSender.setHost(host);
+        mailSender.setPort(port);
+        mailSender.setUsername(username);
+        mailSender.setPassword(password);
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
