@@ -1,42 +1,39 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Modal from "../../components/Modal";
 
 export default function SignUp() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [pw, setPw] = useState("");
-    const [showModal, setShowModal] = useState(false);
-    const router = useRouter();
 
     const handleSignUp = async (e) => {
-        e.preventDefault();
+        e.preventDefault(); // 폼의 기본 제출 동작 방지
+
         const userData = { name, pw, email };
 
         try {
-            const response = await fetch("http://localhost:8080/api/auth/signup", {
-                method: "POST",
+            const response = await fetch('http://localhost:8080/api/auth/signup', {
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(userData),
             });
 
             if (response.ok) {
-                setShowModal(true);
+                const data = await response.json();
+                // 성공 처리 (예: 사용자 리다이렉션)
+                console.log('회원가입 성공:', data);
             } else {
-                console.error("회원가입 실패");
+                // 에러 처리
+                console.error('회원가입 실패');
             }
         } catch (error) {
-            console.error("에러 발생:", error);
+            console.error('에러 발생:', error);
         }
+        console.log("Sign Up:", name, email, pw);
     };
 
-    const handleModalClose = () => {
-        setShowModal(false);
-        router.push("/"); // 메인 홈 페이지로 이동
-    };
 
     return (
         <div className="flex justify-center items-center h-screen">
@@ -66,16 +63,8 @@ export default function SignUp() {
                     required
                     className="mb-4"
                 />
-                <button type="submit" className="bg-blue-500 text-white py-2">
-                    회원가입
-                </button>
+                <button type="submit" className="bg-blue-500 text-white py-2">회원가입</button>
             </form>
-            {showModal && (
-                <Modal
-                    message="회원가입이 완료되었습니다."
-                    onClose={handleModalClose}
-                />
-            )}
         </div>
     );
 }
