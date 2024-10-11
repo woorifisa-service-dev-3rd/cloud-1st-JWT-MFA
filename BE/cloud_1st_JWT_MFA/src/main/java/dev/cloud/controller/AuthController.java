@@ -60,10 +60,10 @@ public class AuthController {
         return ResponseEntity.ok(tokenDto);
     }
 
-    @PostMapping("/logout")
-    public void logout(@RequestHeader("Authorization") String accessToken){
-        authService.logout(accessToken);
-    }
+//    @PostMapping("/logout")
+//    public void logout(@RequestHeader("Authorization") String accessToken){
+//        authService.logout(accessToken);
+//    }
 
 
 }

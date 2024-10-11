@@ -1,9 +1,11 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
+  const router = useRouter();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -13,7 +15,7 @@ export default function Login() {
     const userData = { email, pw };
 
     try {
-      const response = await fetch('http://localhost:8080/api/auth/login', {
+      const response = await fetch('http://localhost:8080/api/auth/signin', {
         method: 'post',
         headers: {
           'Content-Type': 'application/json',
@@ -25,6 +27,7 @@ export default function Login() {
         const data = await response.json();
         // 성공 처리 (예: 사용자 리다이렉션)
         console.log('로긴 성공:', data);
+        router.push(`/verify-email?email=${encodeURIComponent(email)}`);
       } else {
         // 에러 처리
         console.error('로긴 실패');

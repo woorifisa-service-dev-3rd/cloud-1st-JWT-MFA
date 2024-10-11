@@ -1,11 +1,13 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function SignUp() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [pw, setPw] = useState("");
-
+    const router = useRouter();
+    // const message = "회원가입성공"
     const handleSignUp = async (e) => {
         e.preventDefault(); // 폼의 기본 제출 동작 방지
 
@@ -21,9 +23,11 @@ export default function SignUp() {
             });
 
             if (response.ok) {
-                const data = await response.json();
+                // console.log(response.json())
+                // const data = await response.json();
                 // 성공 처리 (예: 사용자 리다이렉션)
-                console.log('회원가입 성공:', data);
+                // console.log('회원가입 성공:', data);
+                router.push('/')
             } else {
                 // 에러 처리
                 console.error('회원가입 실패');

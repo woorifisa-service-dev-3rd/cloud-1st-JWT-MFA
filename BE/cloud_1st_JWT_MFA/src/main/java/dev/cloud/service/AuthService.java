@@ -5,7 +5,6 @@ import dev.cloud.jwt.TokenProvider;
 import dev.cloud.model.Member;
 import dev.cloud.model.TokenBlacklist;
 import dev.cloud.repository.MemberRepository;
-import dev.cloud.repository.TokenBlacklistRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,10 +12,9 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +24,9 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final EmailService emailService;
-    private final TokenBlacklistRepository tokenBlacklistRepository;
-    private final TokenBlacklist tokenBlacklist;
+    private final CustomUserDetailsService customUserDetailsService;
+//    private final TokenBlacklistRepository tokenBlacklistRepository;
+//    private final TokenBlacklist tokenBlacklist;
 
     @Transactional
     public MemberDTO signup(MemberDTO memberDTO) {
@@ -62,21 +61,26 @@ public class AuthService {
     public TokenDto smtpMfa(String email, String authCode) {
         EmailAuthResponseDto EmailAuthDTO = emailService.validateAuthCode(email, authCode);
         if (EmailAuthDTO.isSuccess()) {
+            // 인증 성공 시 사용자 정보 조회
+            UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
+            // Authentication 객체 생성
+            Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            // SecurityContext에 Authentication 설정
+            SecurityContextHolder.getContext().setAuthentication(authentication);
             // 인증 성공 시 토큰 발급
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             return tokenProvider.generateTokenDto(authentication);
         } else {
             throw new RuntimeException("Invalid verification code");
         }
     }
-    @Transactional
-    public void logout(String Token) {
-        String accessToken = Token.replace("Bearer","");
-        if(!tokenProvider.validateToken(accessToken)){
-            throw new RuntimeException();
-        }
-        tokenBlacklist.setToken(accessToken);
-        tokenBlacklist.setExpiryDate(LocalDateTime.now());
-        tokenBlacklistRepository.save(tokenBlacklist);
-    }
+//    @Transactional
+//    public void logout(String Token) {
+//        String accessToken = Token.replace("Bearer","");
+//        if(!tokenProvider.validateToken(accessToken)){
+//            throw new RuntimeException();
+//        }
+//        tokenBlacklist.setToken(accessToken);
+//        tokenBlacklist.setExpiryDate(LocalDateTime.now());
+//        tokenBlacklistRepository.save(tokenBlacklist);
+//    }
 }
