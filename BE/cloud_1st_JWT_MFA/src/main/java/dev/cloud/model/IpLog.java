@@ -3,6 +3,8 @@ package dev.cloud.model;
 
 import jakarta.persistence.*;
 
+import java.util.Date;
+
 
 @Entity
 public class IpLog {
@@ -12,4 +14,6 @@ public class IpLog {
 
     @ManyToOne
     private Member member;
+
+    private Date LoginDate;
 }

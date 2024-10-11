@@ -26,9 +26,7 @@ public record MemberDTO(
         @NotBlank(message = "이름은 필수 입력 사항입니다.")
         String name,
 
-        Authority authority,
-
-        String memberIp
+        Authority authority
 ) {
 
     // 엔티티를 DTO로 변환하는 정적 메소드
