@@ -58,7 +58,9 @@ public class EmailService {
     }
 
     public EmailAuthResponseDto validateAuthCode(String email, String authCode) {
+        System.out.println(email);
         String findAuthCode = redisService.getData(email);
+        System.out.println(authCode+": "+findAuthCode);
         if (findAuthCode == null) {
             return new EmailAuthResponseDto(false, "인증번호가 만료되었습니다. 다시 시도해주세요.");
         }

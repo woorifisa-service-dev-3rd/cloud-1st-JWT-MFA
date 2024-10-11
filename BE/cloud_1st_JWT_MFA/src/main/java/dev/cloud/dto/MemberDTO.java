@@ -29,6 +29,13 @@ public record MemberDTO(
         Authority authority
 ) {
 
+    // SignInRequestDto로부터 MemberDTO 생성
+    public static MemberDTO fromSignInRequest(SignInRequestDto signInRequestDto) {
+        return MemberDTO.builder()
+                .email(signInRequestDto.email())
+                .pw(signInRequestDto.pw())
+                .build();
+    }
     // 엔티티를 DTO로 변환하는 정적 메소드
     public static MemberDTO fromEntity(Member member) {
         return new MemberDTO(

@@ -1,24 +1,21 @@
 package dev.cloud.controller;
 
 import dev.cloud.dto.*;
-import dev.cloud.model.Member;
 import dev.cloud.service.AuthService;
-import dev.cloud.service.EmailService;
-import dev.cloud.service.MemberService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthController {
-    private final EmailService emailService;
-    private final MemberService memberService;
-
     private final AuthService authService;
 
     @PostMapping("/signup")
@@ -30,20 +27,22 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<?> signin(@RequestBody MemberDTO memberDTO) {
+    public ResponseEntity<?> signin(@RequestBody SignInRequestDto signInRequestDto) {
         // 로그인
-        if (authService.login(memberDTO)) {
+        LoginResultDTO loginResultDTO = authService.login(signInRequestDto);
+        if (loginResultDTO.isSuccessful()) {
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new EmailAuthResponseDto(true, "이메일에서 인증번호를 확인해주세요"));
+                    .body(loginResultDTO);
         }
         // 로그인 실패 응답
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new EmailAuthResponseDto(false, "비밀번호를 확인해주세요"));
+                .body(loginResultDTO);
     }
 
     // 2차 인증
     @PostMapping("/smtp")
     public ResponseEntity<?> login(@RequestBody AuthRequestDto authRequestDto, HttpServletResponse response) {
+        System.out.println(authRequestDto.authCode());
         // 2차 인증 성공 시 토큰 발급
         TokenDto tokenDto = authService.smtpMfa(authRequestDto.email(), authRequestDto.authCode());
 

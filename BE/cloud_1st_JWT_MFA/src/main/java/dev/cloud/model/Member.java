@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,8 +30,8 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Authority authority;
 
-    @ManyToOne
-    private IpLog ipLog;
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<IpLog> ipLogs; // 여러 IpLog를 가질 수 있도록 설정
 
     @Builder
     public Member(String email, String pw, String name, Authority authority) {
