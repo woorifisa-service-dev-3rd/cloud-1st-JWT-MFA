@@ -32,15 +32,15 @@ public record MemberDTO(
 ) {
 
     // 엔티티를 DTO로 변환하는 정적 메소드
-    public static MemberDTO fromEntity(Member member) {
-        return new MemberDTO(
-                member.getId(),
-                member.getEmail(),
-                member.getPw(),
-                member.getName(),
-                member.getAuthority()
-        );
-    }
+//    public static MemberDTO fromEntity(Member member) {
+//        return new MemberDTO(
+//                member.getId(),
+//                member.getEmail(),
+//                member.getPw(),
+//                member.getName(),
+//                member.getAuthority()
+//        );
+//    }
 
     // DTO를 엔티티로 변환하는 메소드
     public Member toEntity() {
@@ -67,15 +67,15 @@ public record MemberDTO(
     }
 
     // 기존 DTO를 기반으로 일부 필드만 변경한 새로운 DTO를 생성하는 메소드
-    public MemberDTO copyWith(String email, String pw, String name, Authority authority) {
-        return new MemberDTO(
-                this.id,
-                email != null ? email : this.email,
-                pw != null ? pw : this.pw,
-                name != null ? name : this.name,
-                authority != null ? authority : this.authority
-        );
-    }
+//    public MemberDTO copyWith(String email, String pw, String name, Authority authority) {
+//        return new MemberDTO(
+//                this.id,
+//                email != null ? email : this.email,
+//                pw != null ? pw : this.pw,
+//                name != null ? name : this.name,
+//                authority != null ? authority : this.authority
+//        );
+//    }
 
     // DTO를 JSON으로 변환하는 메소드
     public String toJson() throws JsonProcessingException {

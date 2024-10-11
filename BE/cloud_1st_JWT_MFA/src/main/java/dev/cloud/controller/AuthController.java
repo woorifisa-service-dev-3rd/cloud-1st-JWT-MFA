@@ -45,6 +45,7 @@ public class AuthController {
     @PostMapping("/smtp")
     public ResponseEntity<?> login(@RequestBody AuthRequestDto authRequestDto, HttpServletResponse response) {
         // 2차 인증 성공 시 토큰 발급
+        System.out.println(authRequestDto.authCode());
         TokenDto tokenDto = authService.smtpMfa(authRequestDto.email(), authRequestDto.authCode());
 
         // Refresh Token을 HttpOnly 쿠키로 설정
