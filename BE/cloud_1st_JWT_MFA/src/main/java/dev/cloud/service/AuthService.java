@@ -42,6 +42,8 @@ public class AuthService {
 
             // 비밀번호 인증 성공 시 이메일로 인증 코드 전송
             emailService.sendEmail(memberDTO.email());
+            // 비밀번호 인증 성공 접속 ip 저장
+
             return true;
         } catch (AuthenticationException e) {
             // 인증 실패 처리
