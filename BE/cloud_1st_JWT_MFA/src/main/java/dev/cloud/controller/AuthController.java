@@ -45,7 +45,6 @@ public class AuthController {
     @PostMapping("/smtp")
     public ResponseEntity<?> login(@RequestBody AuthRequestDto authRequestDto, HttpServletResponse response) {
         // 2차 인증 성공 시 토큰 발급
-        System.out.println(authRequestDto.authCode());
         TokenDto tokenDto = authService.smtpMfa(authRequestDto.email(), authRequestDto.authCode());
 
         // Refresh Token을 HttpOnly 쿠키로 설정
@@ -59,6 +58,11 @@ public class AuthController {
 
         // accessToken만 바디로 반환
         return ResponseEntity.ok(tokenDto);
+    }
+
+    @PostMapping("/logout")
+    public void logout(@RequestHeader("Authorization") String accessToken){
+        authService.logout(accessToken);
     }
 
 

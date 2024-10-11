@@ -3,7 +3,9 @@ package dev.cloud.service;
 import dev.cloud.dto.*;
 import dev.cloud.jwt.TokenProvider;
 import dev.cloud.model.Member;
+import dev.cloud.model.TokenBlacklist;
 import dev.cloud.repository.MemberRepository;
+import dev.cloud.repository.TokenBlacklistRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,6 +16,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -22,6 +26,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final EmailService emailService;
+    private final TokenBlacklistRepository tokenBlacklistRepository;
+    private final TokenBlacklist tokenBlacklist;
 
     @Transactional
     public MemberDTO signup(MemberDTO memberDTO) {
@@ -62,5 +68,15 @@ public class AuthService {
         } else {
             throw new RuntimeException("Invalid verification code");
         }
+    }
+    @Transactional
+    public void logout(String Token) {
+        String accessToken = Token.replace("Bearer","");
+        if(!tokenProvider.validateToken(accessToken)){
+            throw new RuntimeException();
+        }
+        tokenBlacklist.setToken(accessToken);
+        tokenBlacklist.setExpiryDate(LocalDateTime.now());
+        tokenBlacklistRepository.save(tokenBlacklist);
     }
 }
