@@ -28,6 +28,9 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Authority authority;
 
+    @ManyToOne
+    private IpLog ipLog;
+
     @Builder
     public Member(String email, String pw, String name, Authority authority) {
         this.email =email;
