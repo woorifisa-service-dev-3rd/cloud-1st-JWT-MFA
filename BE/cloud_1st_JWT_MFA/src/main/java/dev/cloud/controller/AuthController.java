@@ -1,11 +1,10 @@
 package dev.cloud.controller;
 
-import dev.cloud.dto.EmailAuthResponseDto;
-import dev.cloud.dto.SigninResponseDto;
-import dev.cloud.model.User;
-import dev.cloud.record.UserDTO;
+import dev.cloud.dto.*;
+import dev.cloud.model.Member;
+import dev.cloud.service.AuthService;
 import dev.cloud.service.EmailService;
-import dev.cloud.service.UserService;
+import dev.cloud.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,47 +15,41 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 public class AuthController {
     private final EmailService emailService;
-    private final UserService userService;
+    private final MemberService memberService;
+
+    private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody UserDTO userDTO) {
-        // 회원가입 요청 변환 및 저장
-        User newUser = userService.signUp(userDTO.toEntity());
-        // 기본 응답 반환
-        return ResponseEntity.ok(UserDTO.basicResponse(newUser));
+    public ResponseEntity<?> signup(@RequestBody MemberDTO memberDTO) {
+        MemberDTO mberDTO = authService.signup(memberDTO);
+
+        // 성공 가입
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<?> signin(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<?> signin(@RequestBody MemberDTO memberDTO) {
         // 로그인
-        if (userService.signin(userDTO.toEntity())) {
-            EmailAuthResponseDto emailResponse = emailService.sendEmail(userDTO.email());
-            SigninResponseDto response = new SigninResponseDto(
-                    "이메일 인증 코드를 입력하세요.",
-                    userDTO.email(),
-                    emailResponse.isSuccess()
-            );
-            return ResponseEntity.ok(response);
+        if (authService.login(memberDTO)) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new EmailAuthResponseDto(true, "이메일을 확인해주세요"));
         }
         // 로그인 실패 응답
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new EmailAuthResponseDto(false, "비밀번호를 확인해주세요"));
     }
 
-    // 인증번호 검증
-    @PostMapping(value = "/auth", produces = "application/json")
-    public ResponseEntity<?> checkAuthCode(@RequestParam String address, @RequestParam String authCode) {
-        boolean isVerified = emailService.validateAuthCode(address, authCode).isSuccess();
-
-        if (isVerified) { // 인증번호 맞춤
-            // 사용자 검색
-            // JWT 발급
-            return new ResponseEntity<>(HttpStatus.OK);
+    // 2차 인증
+    @PostMapping("/smtp")
+    public ResponseEntity<?> login(@RequestBody AuthRequestDto authRequestDto) {
+        TokenDto JWT = authService.smtpMfa(authRequestDto.email(), authRequestDto.authCode());
+        if (JWT == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        // 인증번호 틀림
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(new EmailAuthResponseDto(false, "인증 코드가 일치하지 않습니다."));
+        return new ResponseEntity<>(JWT, HttpStatus.OK);
     }
+
+
 }
 
 

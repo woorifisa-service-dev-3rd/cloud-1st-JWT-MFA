@@ -1,5 +1,10 @@
 package dev.cloud.config;
 
+import dev.cloud.jwt.JwtAccessDeniedHandler;
+import dev.cloud.jwt.JwtAuthenticationEntryPoint;
+import dev.cloud.jwt.JwtFilter;
+import dev.cloud.jwt.TokenProvider;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -7,33 +12,40 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableWebSecurity
-public class SecurityConfig  {
-   @Bean
+@RequiredArgsConstructor
+public class SecurityConfig {
+    private final TokenProvider tokenProvider;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-       http
-               // CSRF 비활성화 (API 서버의 경우)
-               .csrf(csrf -> csrf.disable())
-
-               // 세션을 상태 없음으로 설정 (Stateless)
-               .sessionManagement(session -> session
-                       .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-               )
-
-               // 요청에 대한 권한 부여 설정
-               .authorizeHttpRequests(auth -> auth
-                       .requestMatchers("/api/users/**").permitAll() // 인증 관련 API는 모두 허용
-                       .anyRequest().permitAll() // 일단 허용
-               )
-
-               // 폼 로그인 비활성화
-               .formLogin(form -> form.disable())
-
-               // HTTP 기본 인증 비활성화
-               .httpBasic(httpBasic -> httpBasic.disable());
+        http
+                .csrf(csrf -> csrf.disable())
+                .exceptionHandling(handling -> handling
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                        .accessDeniedHandler(jwtAccessDeniedHandler)
+                )
+                .headers((header) -> header.frameOptions(frameOptionsConfig -> frameOptionsConfig.sameOrigin()))
+                // 시큐리티는 기본적으로 세션을 사용하지만, 여기서는 세션을 사용하지 않아 Stateless로 설정
+                .sessionManagement((sessionMng) -> sessionMng.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests((registry) ->
+                        registry
+                                .requestMatchers("/auth/**").permitAll() // 로그인, 회원가입 API는 permitAll()
+                                .anyRequest().permitAll()
+                )
+                .addFilterBefore(new JwtFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class); // jwt 변경사항
 
         return http.build();
 
