@@ -7,7 +7,7 @@ export default function SignUp() {
     const [pw, setPw] = useState("");
 
     const handleSignUp = async (e) => {
-        e.preventDefault(); // 폼의 기본 제출 동작 방지
+        e.preventDefault(); 
 
         const userData = { name, pw, email };
 
@@ -24,6 +24,7 @@ export default function SignUp() {
                 const data = await response.json();
                 // 성공 처리 (예: 사용자 리다이렉션)
                 console.log('회원가입 성공:', data);
+                alert('회원가입 성공:', data);
             } else {
                 // 에러 처리
                 console.error('회원가입 실패');
