@@ -50,7 +50,7 @@ public class AuthController {
         // Refresh Token을 HttpOnly 쿠키로 설정
         Cookie refreshTokenCookie = new Cookie("refreshToken", tokenDto.refreshToken());
         refreshTokenCookie.setHttpOnly(true);   // HttpOnly로 설정하여 XSS 방지
-        refreshTokenCookie.setSecure(true);     // HTTPS에서만 전송
+//        refreshTokenCookie.setSecure(true);     // HTTPS에서만 전송
         refreshTokenCookie.setPath("/");        // 전체 경로에서 사용 가능
         refreshTokenCookie.setMaxAge(7 * 24 * 60 * 60); // 7일 동안 유효
 
